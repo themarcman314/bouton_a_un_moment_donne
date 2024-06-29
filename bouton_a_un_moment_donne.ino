@@ -86,7 +86,6 @@ void setup() {
   
   LittleFS.end();
 
-
   IPAddress local_IP(192,168,1,1);
   IPAddress gateway(192,168,1,1);
   IPAddress subnet(255,255,255,0);
@@ -101,28 +100,14 @@ void setup() {
   Serial.print("AP IP address: ");
   Serial.println(myIP);
 
-
   server.on("/", handleRoot);
   server.on("/toggle", handleled);
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
-
-  // // Common captive portal detection URLs
-  // server.on("/generate_204", handleCaptivePortal); // Android
-  // server.on("/fwlink", handleCaptivePortal); // Windows
-  // server.on("/hotspot-detect.html", handleCaptivePortal); // Apple
-  // server.onNotFound(handleCaptivePortal);
-
-  String responseHTML = ""
-  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
-  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
-  "be redirected here.</p></body></html>";
-  
 
   dnsServer.start(DNS_PORT, "*", local_IP);
 
   server.begin();
   Serial.println("HTTP server started");
-
 }
 
 void loop() {
