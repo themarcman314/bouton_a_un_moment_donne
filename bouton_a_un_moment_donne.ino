@@ -2,11 +2,22 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <DNSServer.h>
+
 
 #ifndef APSSID
 #define APSSID "fbi_van"
 #define APPSK "password"
 #endif
+
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
+
+String responseHTML = ""
+  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
+  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
+  "be redirected here.</p></body></html>";
+
 
 /* Set these to your desired credentials. */
 const char *ssid = APSSID;
@@ -17,13 +28,12 @@ ESP8266WebServer server(80);
 /* Go to http://192.168.4.1 in a web browser */
 void handleRoot() {
   server.send(200, "text/html", "\
-  <h1>Coucou</h1>\
+  <h1>Hello</h1>\
   <a href=\"/toggle\"><button>Toggle LED</button></a>\
   </button>");
 }
 
-void handleled()
-{
+void handleled() {
   if(digitalRead(LED_BUILTIN) == HIGH)
     digitalWrite(LED_BUILTIN, LOW);
   else digitalWrite(LED_BUILTIN, HIGH);
@@ -34,6 +44,16 @@ void handleled()
   </button>");
 }
 
+void handleCaptivePortal() {
+  String header = "HTTP/1.1 302 Found\r\nLocation: http://";
+  header += WiFi.softAPIP().toString();
+  header += "/\r\n\r\n";
+  server.sendContent(header);
+  server.client().stop(); // End the current connection
+
+  // Change the state of the LED
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); // Toggle LED state
+}
 
 
 void setup() {
@@ -66,20 +86,46 @@ void setup() {
   
   LittleFS.end();
 
-  Serial.print("\r\nConfiguring access point...\r\n");
+
+  IPAddress local_IP(192,168,1,1);
+  IPAddress gateway(192,168,1,1);
+  IPAddress subnet(255,255,255,0);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+  
   /* You can remove the password parameter if you want the AP to be open. */
+ 
   WiFi.softAP(ssid/*, password*/);
+  Serial.print("\r\nConfiguring access point...\r\n");
 
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
+
+
   server.on("/", handleRoot);
   server.on("/toggle", handleled);
+  server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
+
+  // // Common captive portal detection URLs
+  // server.on("/generate_204", handleCaptivePortal); // Android
+  // server.on("/fwlink", handleCaptivePortal); // Windows
+  // server.on("/hotspot-detect.html", handleCaptivePortal); // Apple
+  // server.onNotFound(handleCaptivePortal);
+
+  String responseHTML = ""
+  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
+  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
+  "be redirected here.</p></body></html>";
+  
+
+  dnsServer.start(DNS_PORT, "*", local_IP);
+
   server.begin();
   Serial.println("HTTP server started");
 
 }
 
 void loop() {
+  dnsServer.processNextRequest();
   server.handleClient();
 }
