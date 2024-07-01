@@ -10,6 +10,10 @@
 #define APPSK "password"
 #endif
 
+
+static const char TEXT_PLAIN[] PROGMEM = "text/plain";
+File uploadFile;
+
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 
@@ -53,6 +57,55 @@ void handleCaptivePortal() {
 
   // Change the state of the LED
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); // Toggle LED state
+}
+
+void replyOK() {
+  server.send(200, FPSTR(TEXT_PLAIN), "");
+}
+void replyServerError(String msg) {
+  Serial.println(msg);
+  server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
+}
+
+
+void handleFileUpload() {
+  HTTPUpload& upload = server.upload();
+  if (upload.status == UPLOAD_FILE_START) {
+    String filename = upload.filename;
+    Serial.println("Upload starting, filename : " + String(filename));
+  }
+  else if (upload.status == UPLOAD_FILE_WRITE) {
+    if (uploadFile) {
+      size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
+      if (bytesWritten != upload.currentSize) { return replyServerError(F("WRITE FAILED")); }
+    }
+    else if (upload.status == UPLOAD_FILE_END) {
+    if (uploadFile) { uploadFile.close(); }
+    Serial.println(String("Upload: END, Size: ") + upload.totalSize);
+    }
+  }
+
+  // if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
+  // if (server.uri() != "/edit") { return; }
+  // HTTPUpload& upload = server.upload();
+  // if (upload.status == UPLOAD_FILE_START) {
+  //   String filename = upload.filename;
+  //   // Make sure paths always start with "/"
+  //   if (!filename.startsWith("/")) { filename = "/" + filename; }
+  //   DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
+  //   uploadFile = fileSystem->open(filename, "w");
+  //   if (!uploadFile) { return replyServerError(F("CREATE FAILED")); }
+  //   DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
+  // } else if (upload.status == UPLOAD_FILE_WRITE) {
+  //   if (uploadFile) {
+  //     size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
+  //     if (bytesWritten != upload.currentSize) { return replyServerError(F("WRITE FAILED")); }
+  //   }
+  //   DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
+  // } else if (upload.status == UPLOAD_FILE_END) {
+  //   if (uploadFile) { uploadFile.close(); }
+  //   DBG_OUTPUT_PORT.println(String("Upload: END, Size: ") + upload.totalSize);
+  // }
 }
 
 
@@ -103,6 +156,10 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/toggle", handleled);
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
+
+  
+  server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
+  // server.on("/edit", handleFileUpload);
 
   dnsServer.start(DNS_PORT, "*", local_IP);
 
