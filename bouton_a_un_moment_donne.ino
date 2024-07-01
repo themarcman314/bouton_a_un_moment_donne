@@ -4,23 +4,16 @@
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 
-
 #ifndef APSSID
 #define APSSID "fbi_van"
 #define APPSK "password"
 #endif
-
 
 static const char TEXT_PLAIN[] PROGMEM = "text/plain";
 File uploadFile;
 
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
-
-String responseHTML = ""
-  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
-  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
-  "be redirected here.</p></body></html>";
 
 
 /* Set these to your desired credentials. */
@@ -29,12 +22,14 @@ const char *password = APPSK;
 
 ESP8266WebServer server(80);
 
-/* Go to http://192.168.4.1 in a web browser */
 void handleRoot() {
   server.send(200, "text/html", "\
-  <h1>Hello</h1>\
-  <a href=\"/toggle\"><button>Toggle LED</button></a>\
-  </button>");
+  <h1>Select your Upload file</h1>\
+  <form action=\"/edit\" form method=\"post\" enctype=\"multipart/form-data\">\
+  <label for=\"file\">File</label>\
+  <input id=\"file\" name=\"file\" type=\"file\" />\
+  <button>Upload</button>\
+  </form>");
 }
 
 void handleled() {
@@ -113,6 +108,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200);
+  delay(5000);
 
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
@@ -156,10 +152,8 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/toggle", handleled);
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
-
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
-  // server.on("/edit", handleFileUpload);
 
   dnsServer.start(DNS_PORT, "*", local_IP);
 
