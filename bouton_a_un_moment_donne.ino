@@ -65,19 +65,33 @@ void replyServerError(String msg) {
 
 void handleFileUpload() {
   HTTPUpload& upload = server.upload();
+
+  Serial.println("Upload status :" + String(upload.status));
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
+    uploadFile = LittleFS.open("/upload", "r+");
+    if (!uploadFile) {
+      Serial.println("Create failed");
+    }
+    else{ Serial.println("File opened");}
     Serial.println("Upload starting, filename : " + String(filename));
   }
   else if (upload.status == UPLOAD_FILE_WRITE) {
-    if (uploadFile) {
-      size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
-      if (bytesWritten != upload.currentSize) { return replyServerError(F("WRITE FAILED")); }
+    Serial.println("Writing");
+    size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
+    if (bytesWritten != upload.currentSize) { 
+      Serial.println("Something went wrong");
+      return replyServerError(F("WRITE FAILED")); }
     }
-    else if (upload.status == UPLOAD_FILE_END) {
-    if (uploadFile) { uploadFile.close(); }
+  else if (upload.status == UPLOAD_FILE_END) {
+    Serial.println("File Content:");
+    uploadFile.seek(0,SeekSet);
+    while(uploadFile.available()){
+      Serial.write(uploadFile.read());
+    }
+    uploadFile.close();
+    LittleFS.end();
     Serial.println(String("Upload: END, Size: ") + upload.totalSize);
-    }
   }
 
   // if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
@@ -131,9 +145,7 @@ void setup() {
   while(f.available()){
     Serial.write(f.read());
   }
-  f.close();
-  
-  LittleFS.end();
+
 
   IPAddress local_IP(192,168,1,1);
   IPAddress gateway(192,168,1,1);
