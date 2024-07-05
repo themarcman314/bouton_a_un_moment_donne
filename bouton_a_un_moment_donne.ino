@@ -126,22 +126,31 @@ void handleFileUpload() {
 void handleFileList() {
   Dir dir = LittleFS.openDir("/");
 
-  String file_list = "<ul>";
+  String file_info = "<html><body>";
+  file_info += "<h1>Files</h1>";
+  file_info += "<table border='1'>";
+  file_info += "<tr><th>File Name</th><th>Size (bytes)</th></tr>";
+
   while (dir.next()) {
-    file_list += "<li>";
-    file_list += dir.fileName();
-    file_list += "</li>";
-      // output += dir.fileSize();
+    // file_list += "<li>";
+    String file_name = dir.fileName();
+    size_t file_size = dir.fileSize();
+    file_info += "<tr><td>" + file_name + "</td><td>" + String(file_size) + "</td></tr>";
+
+    // file_list += "</li>";
   }
-  file_list += "</ul>";
+  // file_info += "</ul>";
   
-  String html = "<h1>Available files</h1>";
-  html += file_list;
-  html += "</body></html>";
+  // String html = "<h1>Available files</h1>";
+  // html += file_info;
+  // html += "</body></html>";
+
+  file_info += "</table>";
+  file_info += "</body></html>";
 
 
   // send last string
-  server.send(200, "text/html", html);
+  server.send(200, "text/html", file_info);
 }
 
 
