@@ -29,7 +29,9 @@ void handleRoot() {
   <label for=\"file\">File</label>\
   <input id=\"file\" name=\"file\" type=\"file\" />\
   <button>Upload</button>\
-  </form>");
+  </form>\
+  <button onclick=\"location.href='/list'\">Get List</button>"
+  );
 }
 
 void handleled() {
@@ -62,6 +64,10 @@ void replyServerError(String msg) {
   server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
 
+void replyBadRequest(String msg) {
+  Serial.println(msg);
+  server.send(400, FPSTR(TEXT_PLAIN), msg + "\r\n");
+}
 
 void handleFileUpload() {
   HTTPUpload& upload = server.upload();
@@ -117,6 +123,27 @@ void handleFileUpload() {
   // }
 }
 
+void handleFileList() {
+  Dir dir = LittleFS.openDir("/");
+
+  String file_list = "<ul>";
+  while (dir.next()) {
+    file_list += "<li>";
+    file_list += dir.fileName();
+    file_list += "</li>";
+      // output += dir.fileSize();
+  }
+  file_list += "</ul>";
+  
+  String html = "<h1>Available files</h1>";
+  html += file_list;
+  html += "</body></html>";
+
+
+  // send last string
+  server.send(200, "text/html", html);
+}
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -146,7 +173,6 @@ void setup() {
     Serial.write(f.read());
   }
 
-
   IPAddress local_IP(192,168,1,1);
   IPAddress gateway(192,168,1,1);
   IPAddress subnet(255,255,255,0);
@@ -166,6 +192,7 @@ void setup() {
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
+  server.on("/list", HTTP_GET, handleFileList);
 
   dnsServer.start(DNS_PORT, "*", local_IP);
 
