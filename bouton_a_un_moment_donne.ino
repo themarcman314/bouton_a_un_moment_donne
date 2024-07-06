@@ -91,7 +91,6 @@ void handleFileUpload() {
       Serial.write(uploadFile.read());
     }
     uploadFile.close();
-    LittleFS.end();
     Serial.println(String("Upload: END, Size: ") + upload.totalSize);
   }
 }
