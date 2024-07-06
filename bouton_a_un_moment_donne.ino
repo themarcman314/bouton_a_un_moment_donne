@@ -4,6 +4,7 @@
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 #include "pages.h"
+#include "style.h"
 
 // set max space for flash
 // FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
@@ -157,6 +158,10 @@ void setup() {
 
   server.on("/", handleRoot);
   server.on("/toggle", handleled);
+  server.on("/style.css", [] {
+    server.send(200, "text/css", css_file);
+  });
+
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
