@@ -6,7 +6,7 @@
 #include "pages.h"
 
 // set max space for flash
-FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
+// FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
 
 
 #ifndef APSSID
@@ -66,13 +66,15 @@ void handleFileUpload() {
 
   Serial.println("Upload status :" + String(upload.status));
   if (upload.status == UPLOAD_FILE_START) {
-    String filename = "/" + upload.filename;
-    uploadFile = LittleFS.open(upload.filename, "r+");
-    if (!uploadFile) {
-      Serial.println("Create failed");
+    String filename = upload.filename;
+    if (!filename.startsWith("/")) { filename = "/" + filename; }
+    Serial.println("Preparing to upload : " + filename);
+    uploadFile = LittleFS.open(filename, "r+");
+    if (!uploadFile) {Serial.println("Create failed");}
+    else{
+      Serial.println("File opened");
+      Serial.println("Upload starting, filename : " + String(filename));
     }
-    else{ Serial.println("File opened");}
-    Serial.println("Upload starting, filename : " + String(filename));
   }
   else if (upload.status == UPLOAD_FILE_WRITE) {
     Serial.println("Writing");
