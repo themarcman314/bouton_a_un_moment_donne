@@ -115,6 +115,15 @@ void handleFileList() {
   server.send(200, "text/html", file_info);
 }
 
+void handleImageRequest() {
+  if (LittleFS.exists("/foyer.jpg")) {
+    File file = LittleFS.open("/foyer.jpg", "r");
+    server.streamFile(file, "foyer/jpg");
+    file.close();
+  } 
+  else {server.send(404, "text/plain", "File not found");}
+}
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -125,7 +134,7 @@ void setup() {
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
-  if(LittleFS.begin() == true)
+  if(LittleFS.begin() == false)
       Serial.print("\r\nFS mounted\r\n");
   else Serial.print("Problem mounting FS!\r\n");
 
@@ -161,6 +170,8 @@ void setup() {
   server.on("/style.css", [] {
     server.send(200, "text/css", css_file);
   });
+  server.on("/foyer.jpg", HTTP_GET, handleImageRequest);
+
 
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
   

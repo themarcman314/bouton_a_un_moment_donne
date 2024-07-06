@@ -12,6 +12,7 @@ const char index_html[] PROGMEM = R"=====(
 <button>Upload</button>
 </form>
 <button onclick="location.href='/list'">Get List</button>
+<img id="photo_du_foyer" src="/foyer.jpg" alt="Une foto du foyer">
 )=====";
 
 
