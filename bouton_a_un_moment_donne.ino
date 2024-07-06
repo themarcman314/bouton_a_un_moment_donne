@@ -69,7 +69,7 @@ void handleFileUpload() {
     String filename = upload.filename;
     if (!filename.startsWith("/")) { filename = "/" + filename; }
     Serial.println("Preparing to upload : " + filename);
-    uploadFile = LittleFS.open(filename, "r+");
+    uploadFile = LittleFS.open(filename, "w+");
     if (!uploadFile) {Serial.println("Create failed");}
     else{
       Serial.println("File opened");
