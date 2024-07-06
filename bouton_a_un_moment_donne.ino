@@ -5,6 +5,10 @@
 #include <DNSServer.h>
 #include "pages.h"
 
+// set max space for flash
+FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
+
+
 #ifndef APSSID
 #define APSSID "fbi_van"
 #define APPSK "password"
@@ -62,8 +66,8 @@ void handleFileUpload() {
 
   Serial.println("Upload status :" + String(upload.status));
   if (upload.status == UPLOAD_FILE_START) {
-    String filename = upload.filename;
-    uploadFile = LittleFS.open("/upload", "r+");
+    String filename = "/" + upload.filename;
+    uploadFile = LittleFS.open(upload.filename, "r+");
     if (!uploadFile) {
       Serial.println("Create failed");
     }
@@ -73,6 +77,7 @@ void handleFileUpload() {
   else if (upload.status == UPLOAD_FILE_WRITE) {
     Serial.println("Writing");
     size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
+    Serial.println("Bytes written :" + String(bytesWritten));
     if (bytesWritten != upload.currentSize) { 
       Serial.println("Something went wrong");
       return replyServerError(F("WRITE FAILED")); }
