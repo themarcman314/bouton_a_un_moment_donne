@@ -3,6 +3,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
+#include "pages.h"
 
 #ifndef APSSID
 #define APSSID "fbi_van"
@@ -22,15 +23,7 @@ const char *password = APPSK;
 ESP8266WebServer server(80);
 
 void handleRoot() {
-  server.send(200, "text/html", "\
-  <h1>Select your Upload file</h1>\
-  <form action=\"/edit\" form method=\"post\" enctype=\"multipart/form-data\">\
-  <label for=\"file\">File</label>\
-  <input id=\"file\" name=\"file\" type=\"file\" />\
-  <button>Upload</button>\
-  </form>\
-  <button onclick=\"location.href='/list'\">Get List</button>"
-  );
+  server.send(200, "text/html", index_html);
 }
 
 void handleled() {
@@ -38,10 +31,7 @@ void handleled() {
     digitalWrite(LED_BUILTIN, LOW);
   else digitalWrite(LED_BUILTIN, HIGH);
 
-  server.send(200, "text/html", "\
-  <h1>Hello this is the toogle led page</h1>\
-  <a href=\"/toggle\"><button>Toggle LED</button></a>\
-  </button>");
+  server.send(200, "text/html", toggleLED_html);
 }
 
 void handleCaptivePortal() {
