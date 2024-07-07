@@ -1,4 +1,8 @@
-#include "LittleFS.h"
+// #include "LittleFS.h"
+#include "AudioFileSourceSPIFFS.h"
+#include "AudioGeneratorMP3.h"
+#include "AudioOutputI2SNoDAC.h"
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -70,7 +74,7 @@ void handleFileUpload() {
     String filename = upload.filename;
     if (!filename.startsWith("/")) { filename = "/" + filename; }
     Serial.println("Preparing to upload : " + filename);
-    uploadFile = LittleFS.open(filename, "w+");
+    uploadFile = SPIFFS.open(filename, "w+");
     if (!uploadFile) {Serial.println("Create failed");}
     else{
       Serial.println("File opened");
@@ -97,7 +101,7 @@ void handleFileUpload() {
 }
 
 void handleFileList() {
-  Dir dir = LittleFS.openDir("/");
+  Dir dir = SPIFFS.openDir("/");
 
   String file_info = "<html><body>";
   file_info += "<h1>Files</h1>";
@@ -116,8 +120,8 @@ void handleFileList() {
 }
 
 void handleImageRequest() {
-  if (LittleFS.exists("/foyer.jpg")) {
-    File file = LittleFS.open("/foyer.jpg", "r");
+  if (SPIFFS.exists("/foyer.jpg")) {
+    File file = SPIFFS.open("/foyer.jpg", "r");
     server.streamFile(file, "foyer/jpg");
     file.close();
   } 
@@ -134,15 +138,15 @@ void setup() {
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
-  if(LittleFS.begin() == false)
-      Serial.print("\r\nFS mounted\r\n");
-  else Serial.print("Problem mounting FS!\r\n");
+  if(SPIFFS.begin() == true)
+      Serial.print("\r\n\nFS mounted\r\n");
+  else Serial.print("\r\n\nProblem mounting FS!\r\n");
 
-  if(LittleFS.exists("/secret_file.txt") == true)
+  if(SPIFFS.exists("/secret_file.txt") == true)
     Serial.println("File exists");
   else Serial.println("File does not exist");
 
-  File f = LittleFS.open("/secret_file.txt", "r");
+  File f = SPIFFS.open("/secret_file.txt", "r");
   if (!f) {
     Serial.println("file open failed");
   }
