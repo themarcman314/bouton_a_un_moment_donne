@@ -38,7 +38,18 @@ const char *password = APPSK;
 ESP8266WebServer server(80);
 
 void handleRoot() {
-  server.send(200, "text/html", index_html);
+  String main_page = index_html;
+
+  Dir dir = SPIFFS.openDir("/");
+  
+  while (dir.next()) {
+    String file_name = dir.fileName();
+    Serial.println(file_name);
+    main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
+  }
+  main_page += "</select><input type=\"submit\" value=\"Submit\"></form>";
+  main_page += "</body></html>";
+  server.send(200, "text/html", main_page);
 }
 
 void handleLed() {
@@ -70,7 +81,7 @@ void replyBadRequest(String msg) {
 }
 
 void handleFileUpload() {
-  handleRoot();
+  // handleRoot();
   HTTPUpload& upload = server.upload();
 
   Serial.println("Upload status :" + String(upload.status));
@@ -135,19 +146,28 @@ void handleImageRequest() {
 void handleMusicSelection() {
   handleRoot();
   Serial.println("In audio cb");
-  
-  if(SPIFFS.exists("/jamonit.mp3")) {
-    Serial.println("File exists");
+
+  String selected_file = server.arg("file");
+  Serial.println("Selected file : " + selected_file);
+
+  const char *file_name = selected_file.c_str();
+
+  if(SPIFFS.exists(file_name)) {
+    Serial.println(selected_file + "File exists");
   }
-  else {Serial.println("File does not exist :(");}
-  file = new AudioFileSourceSPIFFS("/jamonit.mp3");
+  else {Serial.println(selected_file + "File does not exist :(");}
+  file = new AudioFileSourceSPIFFS(file_name);
   out = new AudioOutputI2S();
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
+
   
   while(1) {
     if (mp3->isRunning()) {
       if (!mp3->loop()) mp3->stop(); 
+    }
+    else {
+      break;
     }
   }
 }
@@ -194,16 +214,17 @@ void setup() {
 
   server.on("/", handleRoot);
   server.on("/toggle", handleLed);
-  server.on("/select", handleMusicSelection);
+ 
   server.on("/style.css", [] {
     server.send(200, "text/css", css_file);
   });
   server.on("/foyer.jpg", HTTP_GET, handleImageRequest);
 
-
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
+  server.on("/select", handleMusicSelection);
+
   server.on("/list", HTTP_GET, handleFileList);
 
   dnsServer.start(DNS_PORT, "*", local_IP);

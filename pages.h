@@ -16,10 +16,11 @@ const char index_html[] PROGMEM = R"=====(
 <button>Toggle LED</button>
 </a>
 
-<form action="/select" method="get">
-    <button type="submit">Play audio</button>
 </form>
-
+    <h1>Select a File</h1>
+    <form action="/select" method="post">
+        <label for="fileSelect">Choose a file:</label>
+        <select name="file" id="fileSelect">
 )=====";
 
 
