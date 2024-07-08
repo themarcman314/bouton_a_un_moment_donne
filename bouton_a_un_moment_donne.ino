@@ -1,4 +1,10 @@
-#include "LittleFS.h"
+// #include "LittleFS.h"
+#include <Arduino.h>
+#include "AudioFileSourceSPIFFS.h"
+#include "AudioGeneratorMP3.h"
+#include "AudioOutputI2SNoDAC.h"
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -18,6 +24,10 @@
 static const char TEXT_PLAIN[] PROGMEM = "text/plain";
 File uploadFile;
 
+AudioGeneratorMP3 *mp3;
+AudioFileSourceSPIFFS *file;
+AudioOutputI2S *out;
+
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 
@@ -28,15 +38,23 @@ const char *password = APPSK;
 ESP8266WebServer server(80);
 
 void handleRoot() {
-  server.send(200, "text/html", index_html);
+  String main_page = index_html;
+
+  Dir dir = SPIFFS.openDir("/");
+  
+  while (dir.next()) {
+    String file_name = dir.fileName();
+    Serial.println(file_name);
+    main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
+  }
+  main_page += "</select><input type=\"submit\" value=\"Submit\"></form>";
+  main_page += "</body></html>";
+  server.send(200, "text/html", main_page);
 }
 
-void handleled() {
-  if(digitalRead(LED_BUILTIN) == HIGH)
-    digitalWrite(LED_BUILTIN, LOW);
-  else digitalWrite(LED_BUILTIN, HIGH);
-
-  server.send(200, "text/html", toggleLED_html);
+void handleLed() {
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  handleRoot();
 }
 
 void handleCaptivePortal() {
@@ -63,6 +81,7 @@ void replyBadRequest(String msg) {
 }
 
 void handleFileUpload() {
+  // handleRoot();
   HTTPUpload& upload = server.upload();
 
   Serial.println("Upload status :" + String(upload.status));
@@ -70,7 +89,7 @@ void handleFileUpload() {
     String filename = upload.filename;
     if (!filename.startsWith("/")) { filename = "/" + filename; }
     Serial.println("Preparing to upload : " + filename);
-    uploadFile = LittleFS.open(filename, "w+");
+    uploadFile = SPIFFS.open(filename, "w+");
     if (!uploadFile) {Serial.println("Create failed");}
     else{
       Serial.println("File opened");
@@ -97,7 +116,7 @@ void handleFileUpload() {
 }
 
 void handleFileList() {
-  Dir dir = LittleFS.openDir("/");
+  Dir dir = SPIFFS.openDir("/");
 
   String file_info = "<html><body>";
   file_info += "<h1>Files</h1>";
@@ -116,14 +135,42 @@ void handleFileList() {
 }
 
 void handleImageRequest() {
-  if (LittleFS.exists("/foyer.jpg")) {
-    File file = LittleFS.open("/foyer.jpg", "r");
+  if (SPIFFS.exists("/foyer.jpg")) {
+    File file = SPIFFS.open("/foyer.jpg", "r");
     server.streamFile(file, "foyer/jpg");
     file.close();
   } 
   else {server.send(404, "text/plain", "File not found");}
 }
 
+void handleMusicSelection() {
+  handleRoot();
+  Serial.println("In audio cb");
+
+  String selected_file = server.arg("file");
+  Serial.println("Selected file : " + selected_file);
+
+  const char *file_name = selected_file.c_str();
+
+  if(SPIFFS.exists(file_name)) {
+    Serial.println(selected_file + "File exists");
+  }
+  else {Serial.println(selected_file + "File does not exist :(");}
+  file = new AudioFileSourceSPIFFS(file_name);
+  out = new AudioOutputI2S();
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+
+  
+  while(1) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) mp3->stop(); 
+    }
+    else {
+      break;
+    }
+  }
+}
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -134,15 +181,15 @@ void setup() {
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
-  if(LittleFS.begin() == false)
-      Serial.print("\r\nFS mounted\r\n");
-  else Serial.print("Problem mounting FS!\r\n");
+  if(SPIFFS.begin() == true)
+      Serial.print("\r\n\nFS mounted\r\n");
+  else Serial.print("\r\n\nProblem mounting FS!\r\n");
 
-  if(LittleFS.exists("/secret_file.txt") == true)
+  if(SPIFFS.exists("/secret_file.txt") == true)
     Serial.println("File exists");
   else Serial.println("File does not exist");
 
-  File f = LittleFS.open("/secret_file.txt", "r");
+  File f = SPIFFS.open("/secret_file.txt", "r");
   if (!f) {
     Serial.println("file open failed");
   }
@@ -166,16 +213,18 @@ void setup() {
   Serial.println(myIP);
 
   server.on("/", handleRoot);
-  server.on("/toggle", handleled);
+  server.on("/toggle", handleLed);
+ 
   server.on("/style.css", [] {
     server.send(200, "text/css", css_file);
   });
   server.on("/foyer.jpg", HTTP_GET, handleImageRequest);
 
-
   server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
+  server.on("/select", handleMusicSelection);
+
   server.on("/list", HTTP_GET, handleFileList);
 
   dnsServer.start(DNS_PORT, "*", local_IP);
