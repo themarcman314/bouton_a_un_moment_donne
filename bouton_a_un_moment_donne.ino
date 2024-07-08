@@ -1,7 +1,9 @@
 // #include "LittleFS.h"
+#include <Arduino.h>
 #include "AudioFileSourceSPIFFS.h"
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
+
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -22,6 +24,10 @@
 static const char TEXT_PLAIN[] PROGMEM = "text/plain";
 File uploadFile;
 
+AudioGeneratorMP3 *mp3;
+AudioFileSourceSPIFFS *file;
+AudioOutputI2S *out;
+
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 
@@ -35,12 +41,10 @@ void handleRoot() {
   server.send(200, "text/html", index_html);
 }
 
-void handleled() {
+void handleLed() {
   if(digitalRead(LED_BUILTIN) == HIGH)
     digitalWrite(LED_BUILTIN, LOW);
   else digitalWrite(LED_BUILTIN, HIGH);
-
-  server.send(200, "text/html", toggleLED_html);
 }
 
 void handleCaptivePortal() {
@@ -128,6 +132,25 @@ void handleImageRequest() {
   else {server.send(404, "text/plain", "File not found");}
 }
 
+void handleMusicSelection() {
+  server.send(200, "text/plain", "Music selection handled");
+  Serial.println("In audio cb");
+  
+  if(SPIFFS.exists("/jamonit.mp3")) {
+    Serial.println("File exists");
+  }
+  else {Serial.println("File does not exist :(");}
+  file = new AudioFileSourceSPIFFS("/jamonit.mp3");
+  out = new AudioOutputI2S();
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+  
+  while(1) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) mp3->stop(); 
+    }
+  }
+}
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -170,7 +193,8 @@ void setup() {
   Serial.println(myIP);
 
   server.on("/", handleRoot);
-  server.on("/toggle", handleled);
+  server.on("/toggle", handleLed);
+  server.on("/select", handleMusicSelection);
   server.on("/style.css", [] {
     server.send(200, "text/css", css_file);
   });
