@@ -17,7 +17,7 @@ $ git clone "https://github.com/themarcman314/bouton_a_un_moment_donne.git"
 ```
 SSH
 ```bash
-$ git@github.com:themarcman314/bouton_a_un_moment_donne.git
+$ git clone git@github.com:themarcman314/bouton_a_un_moment_donne.git
 ```
 
 ### Wire I2S pins from ESP8266NodeMCU to MAX98357A
