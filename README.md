@@ -1,7 +1,14 @@
-## Flash firmware
-Open `.ino` file with the arduino ide and click the arrow pointing right to flash.
 
 ## Usage
+
+### Wire I2S pins from ESP8266NodeMCU to MAX98357A
+Kindly RTFM and follow wiring from here :
+https://github.com/earlephilhower/ESP8266Audio?tab=readme-ov-file#i2s-dacs
+
+### Flash firmware
+Open `.ino` file with the arduino ide and click the arrow pointing right to flash.
+
+### Configure audio files
 1. Connect to the WPA with Wi-Fi enabled device.
 SSID name is `fbi_van`
 
