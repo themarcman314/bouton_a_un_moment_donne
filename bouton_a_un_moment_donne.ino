@@ -42,9 +42,8 @@ void handleRoot() {
 }
 
 void handleLed() {
-  if(digitalRead(LED_BUILTIN) == HIGH)
-    digitalWrite(LED_BUILTIN, LOW);
-  else digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  handleRoot();
 }
 
 void handleCaptivePortal() {
@@ -71,6 +70,7 @@ void replyBadRequest(String msg) {
 }
 
 void handleFileUpload() {
+  handleRoot();
   HTTPUpload& upload = server.upload();
 
   Serial.println("Upload status :" + String(upload.status));
@@ -133,7 +133,7 @@ void handleImageRequest() {
 }
 
 void handleMusicSelection() {
-  server.send(200, "text/plain", "Music selection handled");
+  handleRoot();
   Serial.println("In audio cb");
   
   if(SPIFFS.exists("/jamonit.mp3")) {
