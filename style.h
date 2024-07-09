@@ -1,4 +1,8 @@
 const char css_file[] PROGMEM = R"=====(
+img {
+        display: block;
+        max-width: 100%;
+}
 body
 {
         color: white;
@@ -26,4 +30,3 @@ h2
         margin: 5%;
 }
 )=====";
-
