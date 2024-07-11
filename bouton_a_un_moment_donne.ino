@@ -47,7 +47,7 @@ void handleRoot() {
     Serial.println(file_name);
     main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
   }
-  main_page += "</select><input type=\"submit\" value=\"Submit\"></form>";
+  main_page += "</select><input type=\"submit\" value=\"Submit\" class=\"buttons\"></form>";
   main_page += "</body></html>";
   server.send(200, "text/html", main_page);
 }
