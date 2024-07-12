@@ -4,6 +4,7 @@ const char index_html[] PROGMEM = R"=====(
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<title>Configuration page</title>
 	<link rel="stylesheet" href="/style.css" />
 </head>
@@ -18,7 +19,6 @@ const char index_html[] PROGMEM = R"=====(
             name="uploadfile"
             accept=".mp3"
             class="buttons">
-        <br><br>
         <input 
             type="submit"
             value="Upload file" 
@@ -40,6 +40,21 @@ const char toggleLED_html[] PROGMEM = R"=====(
 <a href="/toggle">
     <button class="buttons">Toggle LED</button>
 </a>
+</body>
+</html>
+)=====";
+
+const char redirect_page[] PROGMEM = R"=====(
+<!DOCTYPE html>
+<html>
+<body>
+  <script type="text/javascript">
+    if (/Android/i.test(navigator.userAgent)) {
+        window.location.href = "intent://192.168.1.1#Intent;scheme=http;package=com.android.chrome;end";
+    } else {
+        window.location.href = "http://192.168.1.1";
+    }
+</script>
 </body>
 </html>
 )=====";

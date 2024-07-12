@@ -38,6 +38,15 @@ const char *password = APPSK;
 ESP8266WebServer server(80);
 
 void handleRoot() {
+
+  FSInfo fs_info;
+  SPIFFS.info(fs_info);
+
+  // Calculate available space
+  size_t totalBytes = fs_info.totalBytes;
+  size_t usedBytes = fs_info.usedBytes;
+  size_t freeKBytes = (totalBytes - usedBytes)*0.001;
+
   String main_page = index_html;
 
   Dir dir = SPIFFS.openDir("/");
@@ -48,6 +57,9 @@ void handleRoot() {
     main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
   }
   main_page += "</select><input type=\"submit\" value=\"Submit\" class=\"buttons\"></form>";
+  main_page += "<p>Available space : ";
+  main_page += String(freeKBytes);
+  main_page += " KBytes</p>";
   main_page += "</body></html>";
   server.send(200, "text/html", main_page);
 }
@@ -103,13 +115,13 @@ void handleFileUpload() {
     if (bytesWritten != upload.currentSize) { 
       Serial.println("Something went wrong");
       return replyServerError(F("WRITE FAILED")); }
-    }
+  }
   else if (upload.status == UPLOAD_FILE_END) {
-    Serial.println("File Content:");
-    uploadFile.seek(0,SeekSet);
-    while(uploadFile.available()){
-      Serial.write(uploadFile.read());
-    }
+    // Serial.println("File Content:");
+    // uploadFile.seek(0,SeekSet);
+    // while(uploadFile.available()){
+    //   Serial.write(uploadFile.read());
+    // }
     uploadFile.close();
     Serial.println(String("Upload: END, Size: ") + upload.totalSize);
   }
@@ -181,7 +193,7 @@ void setup() {
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
-  if(SPIFFS.begin() == true)
+  if(SPIFFS.begin() == false)
       Serial.print("\r\n\nFS mounted\r\n");
   else Serial.print("\r\n\nProblem mounting FS!\r\n");
 
@@ -220,10 +232,11 @@ void setup() {
   });
   server.on("/foyer.jpg", HTTP_GET, handleImageRequest);
 
-  server.onNotFound(handleRoot);  // Redirect all other URLs to the root handler
+  server.onNotFound(handleRedirect);  // Redirect all other URLs to the root handler
   
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
   server.on("/select", handleMusicSelection);
+  server.on("/redirect", handleRedirect);
 
   server.on("/list", HTTP_GET, handleFileList);
 
@@ -236,4 +249,9 @@ void setup() {
 void loop() {
   dnsServer.processNextRequest();
   server.handleClient();
+}
+
+
+void handleRedirect() {
+  server.send(200, "text/html", redirect_page);
 }
