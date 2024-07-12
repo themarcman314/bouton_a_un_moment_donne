@@ -1,13 +1,35 @@
 <!DOCTYPE html>
+<html lang="fr">
 <head>
-<title>File Upload</title>
-	<link rel="stylesheet" href="/style.css" />
+  <meta charset="UTF-8">
+  <title>File Upload</title>
+  <link rel="stylesheet" href="./styles/style.css" />
+  <script>
+    function toggleUploadButton() {
+      const fileInput = document.getElementById('file-upload');
+      const uploadButton = document.getElementById('uploadButton');
+      const fileNameLabel = document.getElementById('fileNameLabel');
+      
+      if (fileInput.files.length > 0) {
+        uploadButton.style.display = 'inline-block';
+        fileNameLabel.textContent = `Fichier sélectionné : ${fileInput.files[0].name}`;
+      } else {
+        uploadButton.style.display = 'none';
+        fileNameLabel.textContent = '';
+      }
+    }
+  </script>
 </head>
-
-<h1>Select your Upload file</h1>
-<form action="/edit" form method="post" enctype="multipart/form-data">
-<label for="file">File</label>
-<input id="file" name="file" type="file"/>
-<button>Upload</button>
-</form>
-<button onclick="location.href='/list'">Get List</button>
+<body>
+  <h1>Select your Upload file</h1>
+  <form action="/edit" method="post" enctype="multipart/form-data">
+    <label for="file-upload" class="custom-file-upload">
+      Upload File
+    </label>
+    <input id="file-upload" name="file" type="file" onchange="toggleUploadButton()" />
+    <span id="fileNameLabel"></span><br>
+    <button id="uploadButton" style="display: none;">Upload</button>
+  </form>
+  <button onclick="location.href='/list'">Get List</button>
+</body>
+</html>
