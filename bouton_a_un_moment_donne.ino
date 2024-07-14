@@ -60,7 +60,26 @@ void handleRoot() {
   main_page += "<p>Available space : ";
   main_page += String(freeKBytes);
   main_page += " KBytes</p>";
+
+  main_page += R"=====(
+  <h1>Delete</h1>
+  <form action="/delete" method="post">
+      <label for="fileDelete">Choose a file to delete :</label>
+          <select name="file" id="fileDelete">
+  )=====";
+
+  dir = SPIFFS.openDir("/");
+  
+  while (dir.next()) {
+    String file_name = dir.fileName();
+    Serial.println(file_name);
+    main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
+  }
+  main_page += "</select><input type=\"submit\" value=\"Submit\" class=\"buttons\"></form>";
+  
   main_page += "</body></html>";
+
+
   server.send(200, "text/html", main_page);
 }
 
@@ -184,6 +203,20 @@ void handleMusicSelection() {
   }
 }
 
+void handleMusicDeletion() {
+  String selected_file = server.arg("file");
+  Serial.println("Selected file : " + selected_file);
+
+  const char *file_name = selected_file.c_str();
+
+  if(SPIFFS.exists(file_name)) {
+    Serial.println(selected_file + "File exists");
+    SPIFFS.remove(file_name);
+  }
+  else Serial.println("File does not exist");
+  handleRoot();
+}
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -237,6 +270,8 @@ void setup() {
   server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
   server.on("/select", handleMusicSelection);
   server.on("/redirect", handleRedirect);
+  server.on("/delete", handleMusicDeletion);
+
 
   server.on("/list", HTTP_GET, handleFileList);
 

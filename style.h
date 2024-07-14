@@ -32,13 +32,13 @@ body
         margin-left: 0;
         margin-top: 0;
         margin-right: 0;
+        text-align: center;
 }
 main
 {
         max-width: 800px ;
         margin: auto ;
         display: block;
-        text-align: justify;
 }
 h1
 {

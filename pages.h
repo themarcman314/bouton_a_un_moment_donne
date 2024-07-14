@@ -10,7 +10,7 @@ const char index_html[] PROGMEM = R"=====(
 </head>
 
 <body>
-<h1>Select your Upload file</h1>
+<h1>Upload</h1>
 
 <form action="/edit" form method="post" enctype="multipart/form-data">
         <input 
@@ -27,9 +27,9 @@ const char index_html[] PROGMEM = R"=====(
 
 <img id="photo_du_foyer" src="/foyer.jpg" alt="Une foto du foyer">
 
-<h1>Select a File</h1>
+<h1>Play</h1>
 <form action="/select" method="post">
-    <label for="fileSelect">Choose a file:</label>
+    <label for="fileSelect">Choose a file to play:</label>
         <select name="file" id="fileSelect">
 </form>
 )=====";
