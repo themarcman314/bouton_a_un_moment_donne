@@ -28,7 +28,7 @@ https://github.com/earlephilhower/ESP8266Audio?tab=readme-ov-file#i2s-dacs
 Open `.ino` file with the arduino ide and click the arrow pointing right to flash.
 
 ### Configure audio files
-1. Connect to the WPA with Wi-Fi enabled device.
+1. Connect to the WAP with Wi-Fi enabled device.
 SSID name is `fbi_van`
 
 2. Portal with the configuration page should open automatically.
