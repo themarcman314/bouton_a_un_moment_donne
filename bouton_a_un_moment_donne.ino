@@ -168,7 +168,7 @@ void handleFileList() {
 void handleImageRequest() {
   if (SPIFFS.exists("/foyer.jpg")) {
     File file = SPIFFS.open("/foyer.jpg", "r");
-    server.streamFile(file, "foyer/jpg");
+    server.streamFile(file, "foyer.jpg");
     file.close();
   } 
   else {server.send(404, "text/plain", "File not found");}
@@ -226,24 +226,24 @@ void setup() {
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
-  if(SPIFFS.begin() == false)
+  if(SPIFFS.begin() == true)
       Serial.print("\r\n\nFS mounted\r\n");
   else Serial.print("\r\n\nProblem mounting FS!\r\n");
 
-  if(SPIFFS.exists("/secret_file.txt") == true)
+  if(SPIFFS.exists("/foyer.jpg") == true)
     Serial.println("File exists");
   else Serial.println("File does not exist");
 
-  File f = SPIFFS.open("/secret_file.txt", "r");
+  File f = SPIFFS.open("/foyer.jpg", "r");
   if (!f) {
     Serial.println("file open failed");
   }
   else Serial.println("File opened");
 
-  Serial.println("File Content:");
-  while(f.available()){
-    Serial.write(f.read());
-  }
+  // Serial.println("File Content:");
+  // while(f.available()){
+  //   Serial.write(f.read());
+  // }
 
   IPAddress local_IP(192,168,1,1);
   IPAddress gateway(192,168,1,1);
