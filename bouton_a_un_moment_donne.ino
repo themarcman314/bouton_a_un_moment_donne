@@ -112,7 +112,7 @@ void replyBadRequest(String msg) {
 }
 
 void handleFileUpload() {
-  // handleRoot();
+  handleRoot();
   HTTPUpload& upload = server.upload();
 
   Serial.println("Upload status :" + String(upload.status));

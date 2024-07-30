@@ -10,6 +10,7 @@ const char index_html[] PROGMEM = R"=====(
 </head>
 
 <body>
+<div class="loader"></div>
 <h1>Upload</h1>
 
 <form action="/edit" form method="post" enctype="multipart/form-data">
