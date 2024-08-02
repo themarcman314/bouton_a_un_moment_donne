@@ -8,7 +8,11 @@ const char index_html[] PROGMEM = R"=====(
 	<title>Configuration page</title>
 	<link rel="stylesheet" href="/style.css" />
 </head>
-
+<script>
+    window.addEventListener("load", () => {
+      document.querySelector(".loader").classList.add("loader--hidden");
+    });
+</script>
 <body>
 <div class="loader"></div>
 <h1>Upload</h1>
@@ -56,6 +60,7 @@ const char redirect_page[] PROGMEM = R"=====(
         window.location.href = "http://192.168.1.1";
     }
 </script>
+
 </body>
 </html>
 )=====";
