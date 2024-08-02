@@ -8,16 +8,12 @@ const char index_html[] PROGMEM = R"=====(
 	<title>Configuration page</title>
 	<link rel="stylesheet" href="/style.css" />
 </head>
-<script>
-    window.addEventListener("load", () => {
-      document.querySelector(".loader").classList.add("loader--hidden");
-    });
-</script>
+
 <body>
-<div class="loader"></div>
+<div class="loader" id="loader"></div>
 <h1>Upload</h1>
 
-<form action="/edit" form method="post" enctype="multipart/form-data">
+<form id="upload" action="/edit" form method="post" enctype="multipart/form-data">
         <input 
             id="file-upload"
             type="file"
@@ -37,6 +33,15 @@ const char index_html[] PROGMEM = R"=====(
     <label for="fileSelect">Choose a file to play:</label>
         <select name="file" id="fileSelect">
 </form>
+
+<script>
+    window.addEventListener("load", () => {
+      document.querySelector(".loader").classList.add("loader--hidden");
+    });
+    document.getElementById('upload').addEventListener('submit', function() {
+        document.getElementById('loader').classList.remove('loader--hidden');
+    });
+</script>
 )=====";
 
 
