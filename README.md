@@ -38,7 +38,6 @@ If not just go to `192.168.1.1` or any ip at all really.
 Remaining space is displayed on the main page.
 
 ## TODO :
-- Add upload progress bar
 - Increase upload speed
 - Disable I2S pins after playing sound
 - Finish hardware prototype
