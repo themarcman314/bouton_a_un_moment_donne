@@ -62,6 +62,12 @@ h2
   align-items: center;
   justify-content: center;
   background: #333333;
+  transition: opacity 0.75, visibility 0.75;
+}
+.loader--hidden
+{
+  opacity: 0;
+  visibility: hidden;
 }
 .loader::after
 {
