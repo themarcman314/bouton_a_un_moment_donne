@@ -20,7 +20,7 @@ SSH
 $ git clone git@github.com:themarcman314/bouton_a_un_moment_donne.git
 ```
 
-### Wire I2S pins from ESP8266NodeMCU to MAX98357A
+### Wire I2S pins from ESP8266NodeMCU to MAX98357A DAC & class D amp
 Kindly RTFM and follow wiring from here :
 https://github.com/earlephilhower/ESP8266Audio?tab=readme-ov-file#i2s-dacs
 
