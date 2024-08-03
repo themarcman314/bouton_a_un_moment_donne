@@ -18,7 +18,7 @@ const char index_html[] PROGMEM = R"=====(
             id="file-upload"
             type="file"
             name="uploadfile"
-            accept=".mp3"
+            accept="audio/mpeg"
             class="buttons">
         <input 
             type="submit"

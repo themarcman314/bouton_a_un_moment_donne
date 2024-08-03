@@ -1,4 +1,6 @@
 // #include "LittleFS.h"
+// #define HTTP_UPLOAD_BUFLEN 4096
+
 #include <Arduino.h>
 #include "AudioFileSourceSPIFFS.h"
 #include "AudioGeneratorMP3.h"
@@ -14,8 +16,6 @@
 
 // set max space for flash
 // FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
-
-
 #ifndef APSSID
 #define APSSID "fbi_van"
 #define APPSK "password"
@@ -54,7 +54,8 @@ void handleRoot() {
   while (dir.next()) {
     String file_name = dir.fileName();
     Serial.println(file_name);
-    main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
+    if(file_name.endsWith(".mp3"))
+      main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
   }
   main_page += "</select><input type=\"submit\" value=\"Submit\" class=\"buttons\"></form>";
   main_page += "<p>Available space : ";
@@ -127,9 +128,9 @@ void handleFileUpload() {
     }
   }
   else if (upload.status == UPLOAD_FILE_WRITE) {
-    Serial.println("Writing");
+    // Serial.println("Writing");
     size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
-    Serial.println("Bytes written :" + String(bytesWritten));
+    // Serial.println("Bytes written :" + String(bytesWritten));
     if (bytesWritten != upload.currentSize) { 
       Serial.println("Something went wrong");
       return replyServerError(F("WRITE FAILED")); }
