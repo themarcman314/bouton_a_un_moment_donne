@@ -49,11 +49,10 @@ void handleRoot() {
 
   String main_page = index_html;
 
+  // find available mp3 files
   Dir dir = SPIFFS.openDir("/");
-  
   while (dir.next()) {
     String file_name = dir.fileName();
-    Serial.println(file_name);
     if(file_name.endsWith(".mp3"))
       main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
   }
@@ -64,20 +63,19 @@ void handleRoot() {
 
   main_page += R"=====(
   <h1>Delete</h1>
-  <form action="/delete" method="post">
+  <form id="del" action="/delete" method="post">
       <label for="fileDelete">Choose a file to delete :</label>
           <select name="file" id="fileDelete">
   )=====";
 
+  // find available files
   dir = SPIFFS.openDir("/");
-  
   while (dir.next()) {
     String file_name = dir.fileName();
-    Serial.println(file_name);
     main_page += "<option value=\"" + file_name + "\">" + file_name + "</option>";
   }
   main_page += "</select><input type=\"submit\" value=\"Submit\" class=\"buttons\"></form>";
-  
+  main_page += scripts;
   main_page += "</body></html>";
 
 
@@ -115,7 +113,7 @@ void replyBadRequest(String msg) {
 void handleFileUpload() {
   HTTPUpload& upload = server.upload();
 
-  Serial.println("Upload status :" + String(upload.status));
+  // Serial.println("Upload status :" + String(upload.status));
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     if (!filename.startsWith("/")) { filename = "/" + filename; }
@@ -176,7 +174,7 @@ void handleImageRequest() {
 }
 
 void handleMusicSelection() {
-  handleRoot();
+  
   Serial.println("In audio cb");
 
   String selected_file = server.arg("file");
@@ -202,6 +200,7 @@ void handleMusicSelection() {
       break;
     }
   }
+  handleRoot();
 }
 
 void handleMusicDeletion() {

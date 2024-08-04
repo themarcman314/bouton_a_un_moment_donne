@@ -13,7 +13,7 @@ const char index_html[] PROGMEM = R"=====(
 <div class="loader" id="loader"></div>
 <h1>Upload</h1>
 
-<form id="upload" action="/edit" form method="post" enctype="multipart/form-data">
+<form id="upload" action="/edit" method="post" enctype="multipart/form-data">
         <input 
             id="file-upload"
             type="file"
@@ -22,26 +22,18 @@ const char index_html[] PROGMEM = R"=====(
             class="buttons">
         <input 
             type="submit"
-            value="Upload file" 
+            value="Upload file"
             class="buttons">
 </form>
 
 <img id="photo_du_foyer" src="/foyer.jpg" alt="Une foto du foyer">
 
 <h1>Play</h1>
-<form action="/select" method="post">
+<form id="play" action="/select" method="post">
     <label for="fileSelect">Choose a file to play:</label>
         <select name="file" id="fileSelect">
-</form>
 
-<script>
-    window.addEventListener("load", () => {
-      document.querySelector(".loader").classList.add("loader--hidden");
-    });
-    document.getElementById('upload').addEventListener('submit', function() {
-        document.getElementById('loader').classList.remove('loader--hidden');
-    });
-</script>
+
 )=====";
 
 
@@ -68,4 +60,21 @@ const char redirect_page[] PROGMEM = R"=====(
 
 </body>
 </html>
+)=====";
+
+const char scripts[] PROGMEM = R"=====(
+<script>
+    window.addEventListener("load", () => {
+      document.querySelector(".loader").classList.add("loader--hidden");
+    });
+    document.getElementById('upload').addEventListener('submit', function() {
+      document.getElementById('loader').classList.remove('loader--hidden');
+    });
+    document.getElementById('del').addEventListener('submit', function() {
+      document.getElementById('loader').classList.remove('loader--hidden');
+    });
+    document.getElementById('play').addEventListener('submit', function() {
+      document.getElementById('loader').classList.remove('loader--hidden');
+    });
+</script>
 )=====";
