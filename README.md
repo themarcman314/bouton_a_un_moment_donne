@@ -1,3 +1,7 @@
+## HW prototype
+kicad schematic and board files as well as BOM and step files are available here.
+![cool image](https://github.com/themarcman314/bouton_a_un_moment_donne/blob/master/new_speaker.png?raw=true)
+
 This code is not even in alpha.
 
 Was trying to figure out a version name so I asked chatgpt :
@@ -40,4 +44,3 @@ Remaining space is displayed on the main page.
 ## TODO :
 - Increase upload speed
 - Disable I2S pins after playing sound
-- Finish hardware prototype

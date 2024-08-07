@@ -186,11 +186,12 @@ void handleMusicSelection() {
     Serial.println(selected_file + "File exists");
   }
   else {Serial.println(selected_file + "File does not exist :(");}
+
   file = new AudioFileSourceSPIFFS(file_name);
   out = new AudioOutputI2S();
+  // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
-
   
   while(1) {
     if (mp3->isRunning()) {

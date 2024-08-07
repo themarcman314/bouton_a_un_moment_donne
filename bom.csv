@@ -1,0 +1,12 @@
+"Id";"Référence";"Empreinte";"Quantité";"Désignation";"Fournisseur et réf";
+1;"J3";"PinHeader_1x03_P2.54mm_Vertical";1;"Conn_01x03_Pin";;;
+2;"J2";"PinHeader_1x04_P2.54mm_Vertical";1;"Conn_01x04_Pin";;;
+3;"R1";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";1;"1M";;;
+4;"C4";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";1;"10uF";;;
+5;"RV1";"Potentiometer_Piher_T-16H_Single_Horizontal";1;"R_Potentiometer";;;
+6;"A1";"SEEED_113990105";1;"113990105";;;
+7;"R3";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";1;"10K";;;
+8;"J1";"JST_SUR_SM02B-SURS-TF_1x02-1MP_P0.80mm_Horizontal";1;"Conn_01x02";;;
+9;"U1";"TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm";1;"MAX98357A";;;
+10;"R2";"R_0805_2012Metric_Pad1.20x1.40mm_HandSolder";1;"R";;;
+11;"C3";"C_0805_2012Metric_Pad1.18x1.45mm_HandSolder";1;"0.1uF";;;
