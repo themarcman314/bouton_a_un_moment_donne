@@ -35,7 +35,7 @@ const char index_html[] PROGMEM = R"=====(
 
 <h1>Play</h1>
 <form id="play" action="/select" method="post">
-    <label for="fileSelect">Choose a file to play:</label>
+    <label for="fileSelect">Choose the file to be played:</label>
         <select name="file" id="fileSelect">
 
 

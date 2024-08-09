@@ -21,12 +21,18 @@
 #define APPSK "password"
 #endif
 
+void Playsong(void);
+
+
 static const char TEXT_PLAIN[] PROGMEM = "text/plain";
 File uploadFile;
 
 AudioGeneratorMP3 *mp3;
 AudioFileSourceSPIFFS *file;
 AudioOutputI2S *out;
+
+
+String selected_file;
 
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
@@ -173,34 +179,9 @@ void handleImageRequest() {
   else {server.send(404, "text/plain", "File not found");}
 }
 
-void handleMusicSelection() {
-  
-  Serial.println("In audio cb");
-
-  String selected_file = server.arg("file");
+void handleMusicSelection() {  
+  selected_file = server.arg("file");
   Serial.println("Selected file : " + selected_file);
-
-  const char *file_name = selected_file.c_str();
-
-  if(SPIFFS.exists(file_name)) {
-    Serial.println(selected_file + "File exists");
-  }
-  else {Serial.println(selected_file + "File does not exist :(");}
-
-  file = new AudioFileSourceSPIFFS(file_name);
-  out = new AudioOutputI2S();
-  // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
-  mp3 = new AudioGeneratorMP3();
-  mp3->begin(file, out);
-  
-  while(1) {
-    if (mp3->isRunning()) {
-      if (!mp3->loop()) mp3->stop(); 
-    }
-    else {
-      break;
-    }
-  }
   handleRoot();
 }
 
@@ -285,9 +266,41 @@ void setup() {
 void loop() {
   dnsServer.processNextRequest();
   server.handleClient();
+  if(analogRead(D7) == 0)
+  {
+    Playsong();
+    delay(1000);
+  }
 }
 
 
 void handleRedirect() {
   server.send(200, "text/html", redirect_page);
+}
+
+void Playsong(void)
+{
+  const char *file_name = selected_file.c_str();
+  Serial.print(file_name);
+  Serial.println();
+
+  if(SPIFFS.exists(file_name)) {
+    Serial.println(selected_file + "File exists");
+  }
+  else {Serial.println(selected_file + "File does not exist :(");}
+
+  file = new AudioFileSourceSPIFFS(file_name);
+  out = new AudioOutputI2S();
+  // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+  
+  while(1) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) mp3->stop(); 
+    }
+    else {
+      break;
+    }
+  }
 }
