@@ -206,7 +206,7 @@ void setup() {
   delay(5000);  // allow serial port to be opened
 
   SPIFFSConfig cfg;
-  cfg.setAutoFormat(false);
+  cfg.setAutoFormat(true);
   SPIFFS.setConfig(cfg);
   if(SPIFFS.begin() == true)
       Serial.print("\r\n\nFS mounted\r\n");
@@ -291,6 +291,7 @@ void Playsong(void)
 
   file = new AudioFileSourceSPIFFS(file_name);
   out = new AudioOutputI2S();
+  out->SetGain(1.5);
   // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
@@ -304,3 +305,6 @@ void Playsong(void)
     }
   }
 }
+
+
+
