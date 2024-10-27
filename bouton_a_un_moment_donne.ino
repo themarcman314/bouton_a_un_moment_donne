@@ -206,7 +206,7 @@ void setup() {
   delay(5000);  // allow serial port to be opened
 
   SPIFFSConfig cfg;
-  cfg.setAutoFormat(true);
+  cfg.setAutoFormat(false);
   SPIFFS.setConfig(cfg);
   if(SPIFFS.begin() == true)
       Serial.print("\r\n\nFS mounted\r\n");
@@ -305,6 +305,3 @@ void Playsong(void)
     }
   }
 }
-
-
-
