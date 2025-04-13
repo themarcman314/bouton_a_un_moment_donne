@@ -1,6 +1,6 @@
 ## HW prototype
 kicad schematic and board files as well as BOM and step files are available here.
-![cool image](https://github.com/themarcman314/bouton_a_un_moment_donne/blob/master/new_speaker.png?raw=true)
+![cool image](https://github.com/themarcman314/bouton_a_un_moment_donne/blob/master/pcb.png?raw=true)
 
 This code is not even in alpha.
 
