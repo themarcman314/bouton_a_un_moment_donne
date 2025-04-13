@@ -44,4 +44,3 @@ Remaining space is displayed on the main page.
 ## TODO :
 - Increase upload speed
 - Disable I2S pins after playing sound
-- Design enclosure
