@@ -44,5 +44,6 @@ Remaining space is displayed on the main page.
 Be patient when uploading a file.
 Uploading a 1.1 MByte file took me 15 seconds which gives a transfering speed of about 1.1 * 8 / 15 = 0.58 KBit/s
 
+Below is the configuration I set in arduino-ide to increase the upload speed
 
 ![cool image](https://github.com/themarcman314/bouton_a_un_moment_donne/blob/master/upload_speed_optimisation_parameters.png?raw=true)
