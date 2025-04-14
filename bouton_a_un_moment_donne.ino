@@ -183,6 +183,7 @@ void handleMusicSelection() {
   selected_file = server.arg("file");
   Serial.println("Selected file : " + selected_file);
   handleRoot();
+  //Playsong();
 }
 
 void handleMusicDeletion() {
@@ -203,7 +204,6 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200);
-  delay(5000);  // allow serial port to be opened
 
   SPIFFSConfig cfg;
   cfg.setAutoFormat(false);
@@ -221,11 +221,6 @@ void setup() {
     Serial.println("file open failed");
   }
   else Serial.println("File opened");
-
-  // Serial.println("File Content:");
-  // while(f.available()){
-  //   Serial.write(f.read());
-  // }
 
   IPAddress local_IP(192,168,1,1);
   IPAddress gateway(192,168,1,1);
@@ -266,7 +261,7 @@ void setup() {
 void loop() {
   dnsServer.processNextRequest();
   server.handleClient();
-  if(analogRead(D7) == 0)
+  if(digitalRead(D7) == 0)
   {
     Playsong();
     delay(1000);
@@ -291,7 +286,7 @@ void Playsong(void)
 
   file = new AudioFileSourceSPIFFS(file_name);
   out = new AudioOutputI2S();
-  out->SetGain(1.5);
+  out->SetGain(1);
   // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);

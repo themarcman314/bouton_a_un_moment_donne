@@ -38,9 +38,11 @@ SSID name is `fbi_van`
 2. Portal with the configuration page should open automatically.
 If not just go to `192.168.1.1` or any ip at all really.
 
-3. Upload small mp3 files (900 kB or smaller works well). My esp8266 module is limited to 4MB, I am allocating 3MB to the filesystem. Even when doing so, the amount of files that can be uploaded is limited depending on the bit rate, duration of audio, etc...
+3. Upload small mp3 files (2 MByte or smaller works well). My esp8266 module is limited to 4MB, I am allocating 3MB to the filesystem. Even when doing so, the amount of files that can be uploaded is limited depending on the bit rate, duration of audio, etc...
 Remaining space is displayed on the main page.
 
-## TODO :
-- Increase upload speed
-- Disable I2S pins after playing sound
+Be patient when uploading a file.
+Uploading a 1.1 MByte file took me 15 seconds which gives a transfering speed of about 1.1 * 8 / 15 = 0.58 KBit/s
+
+
+![cool image](https://github.com/themarcman314/bouton_a_un_moment_donne/blob/master/upload_speed_optimisation_parameters.png?raw=true)
