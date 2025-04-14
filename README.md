@@ -42,7 +42,7 @@ If not just go to `192.168.1.1` or any ip at all really.
 Remaining space is displayed on the main page.
 
 Be patient when uploading a file.
-Uploading a 1.1 MByte file took me 15 seconds which gives a transfering speed of about 1.1 * 8 / 15 = 0.58 KBit/s
+Uploading a 1.1 MByte file took me 15 seconds which gives a transfering speed of about 1.1 * 8 / 15 = 0.58 MBit/s
 
 Below is the configuration I set in arduino-ide to increase the upload speed
 
