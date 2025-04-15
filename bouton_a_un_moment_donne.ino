@@ -1,6 +1,7 @@
 // #include "LittleFS.h"
 // #define HTTP_UPLOAD_BUFLEN 4096
 
+
 #include <Arduino.h>
 #include "AudioFileSourceSPIFFS.h"
 #include "AudioGeneratorMP3.h"
@@ -182,8 +183,22 @@ void handleImageRequest() {
 void handleMusicSelection() {  
   selected_file = server.arg("file");
   Serial.println("Selected file : " + selected_file);
-  handleRoot();
+  
+  File config_file;
+
+  config_file = SPIFFS.open("/config.txt", "w+");
+  if (!config_file) {Serial.println("Create failed");}
+    else{
+      Serial.println("File opened");
+    }
+  size_t bytesWritten = config_file.write(selected_file.c_str(), selected_file.length());
+  Serial.println(bytesWritten);
+
+  config_file.close();
+
   //Playsong();
+
+  handleRoot();
 }
 
 void handleMusicDeletion() {
@@ -202,6 +217,8 @@ void handleMusicDeletion() {
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(D7, INPUT);
+
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.begin(115200);
 
@@ -215,6 +232,8 @@ void setup() {
   if(SPIFFS.exists("/foyer.jpg") == true)
     Serial.println("File exists");
   else Serial.println("File does not exist");
+
+  SPIFFS.gc();
 
   File f = SPIFFS.open("/foyer.jpg", "r");
   if (!f) {
@@ -275,7 +294,12 @@ void handleRedirect() {
 
 void Playsong(void)
 {
-  const char *file_name = selected_file.c_str();
+  Serial.println("Opening file...");
+  File conf_file = SPIFFS.open("/config.txt", "r");
+  String file_to_play = conf_file.readString();
+  Serial.print(file_to_play);
+
+  const char *file_name = file_to_play.c_str();
   Serial.print(file_name);
   Serial.println();
 
