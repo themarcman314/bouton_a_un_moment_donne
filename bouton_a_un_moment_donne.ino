@@ -15,12 +15,16 @@
 #include "pages.h"
 #include "style.h"
 
+#include "ESP8266TimerInterrupt.h"
+
 // set max space for flash
 // FLASH_MAP_SETUP_CONFIG(FLASH_MAP_MAX_FS)
 #ifndef APSSID
 #define APSSID "fbi_van"
 #define APPSK "password"
 #endif
+
+#define TIMER_INTERVAL_MS        1000
 
 void Playsong(void);
 
@@ -43,6 +47,15 @@ const char *ssid = APSSID;
 const char *password = APPSK;
 
 ESP8266WebServer server(80);
+
+ESP8266Timer ITimer;
+
+volatile bool updateVolume = false;
+
+void IRAM_ATTR TimerHandler()
+{
+  updateVolume = true;
+}
 
 void handleRoot() {
 
@@ -275,6 +288,15 @@ void setup() {
 
   server.begin();
   Serial.println("HTTP server started");
+
+  out = new AudioOutputI2S();
+
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 100, TimerHandler))
+  {
+    Serial.print("Starting  ITimer OK");
+  }
+  else
+    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
 }
 
 void loop() {
@@ -309,15 +331,23 @@ void Playsong(void)
   else {Serial.println(selected_file + "File does not exist :(");}
 
   file = new AudioFileSourceSPIFFS(file_name);
-  out = new AudioOutputI2S();
-  out->SetGain(1);
-  // out->SetGain(analogRead(A0)/250.0); // scale 1023 (10 bit adc) down to 4
+  // out = new AudioOutputI2S();
+  //out->SetGain(1);
+  // out->SetGain(analogRead(A0)/1023);
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
   
   while(1) {
     if (mp3->isRunning()) {
-      if (!mp3->loop()) mp3->stop(); 
+
+      if (updateVolume) {
+      updateVolume = false;
+
+      float volume = analogRead(A0) / 1023.0;
+      out->SetGain(volume);
+      }
+
+    if (!mp3->loop()) mp3->stop(); 
     }
     else {
       break;
