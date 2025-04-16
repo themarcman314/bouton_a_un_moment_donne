@@ -51,6 +51,8 @@ ESP8266WebServer server(80);
 ESP8266Timer ITimer;
 
 volatile bool updateVolume = false;
+volatile bool stop = false;
+
 
 void IRAM_ATTR TimerHandler()
 {
@@ -290,7 +292,7 @@ void setup() {
   Serial.println("HTTP server started");
 
   out = new AudioOutputI2S();
-
+  mp3 = new AudioGeneratorMP3();
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 100, TimerHandler))
   {
     Serial.print("Starting  ITimer OK");
@@ -305,7 +307,6 @@ void loop() {
   if(digitalRead(D7) == 0)
   {
     Playsong();
-    delay(1000);
   }
 }
 
@@ -316,6 +317,7 @@ void handleRedirect() {
 
 void Playsong(void)
 {
+  delay(20);
   Serial.println("Opening file...");
   File conf_file = SPIFFS.open("/config.txt", "r");
   String file_to_play = conf_file.readString();
@@ -334,7 +336,6 @@ void Playsong(void)
   // out = new AudioOutputI2S();
   //out->SetGain(1);
   // out->SetGain(analogRead(A0)/1023);
-  mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
   
   while(1) {
@@ -347,7 +348,7 @@ void Playsong(void)
       out->SetGain(volume);
       }
 
-    if (!mp3->loop()) mp3->stop(); 
+    if (!mp3->loop() || !digitalRead(D7)) mp3->stop(); 
     }
     else {
       break;
